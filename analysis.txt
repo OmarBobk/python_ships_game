@@ -1,0 +1,29 @@
+Requirements:
+    1- at least 10x10
+    2- The total fleet consists of 1, 2, 3 and 4 squares
+       (one unit) ships.
+    3- Ships will be randomly arranged horizontally and
+       vertically.
+    4- The game must produce 2 modes for the gamer:
+            1- Incognito mode: The user will not know where the ships are they.
+            2- Open mode: The user will know where the ships are they.
+    5- The hidden squares : ?
+       The wrong squares : *
+       The ships squares : x
+    6- Messages:
+        1- if user catch one part of a ships:
+                Tebrikler bir gemi vurdunuz
+        2- if user catch no ships:
+                Maalesef isabet edemediniz
+        3- if user catch the whole ship:
+                Tebrikler bir gemi batırdınız
+    7- After every shot you need to clear the console and update the game.
+    8- if user shot a previously location you to inform him. "Zaten tahmin ettiniz"
+    9- The user will be given 1/3 of the size of the playing field as the right to shoot.
+        Ex: width X height = 10 X 10 = 100 / 3 = 33 shoot.
+    10- The game will end in two cases:
+            1- The user uses all his rights and he does not knocks all ships. "Maalesef kaybettiniz"
+            2- The user did knocks all ships in this case you will calculate his score and show it
+               with this message. "Tebrikler 12 puan ile oyunu kazandınız"
+               Ex: he has 33 shots uses 21 and still 12 point.
+
