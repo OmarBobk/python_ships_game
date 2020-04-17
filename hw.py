@@ -15,9 +15,43 @@ def create_the_board(rows, columns):
     return li
 
 
-def get_coordinates_of_duality_ship():
+def get_coordinates_of_unity_ship():
+    """
+        :return: [x, y]
     """
 
+    # Create a random x and y for point
+    point_x = randint(1, row - 1)
+    point_y = randint(1, column - 1)
+
+    # The coordinates of the unity ship
+    return [point_x, point_y]
+
+
+def draw_the_unity_ship(table, recursion_counter=0):
+    """
+    :param recursion_counter:
+    :param table: board list
+    :return: Boolean
+    """
+
+    # [point_x, point_y]
+    ship = get_coordinates_of_unity_ship()
+    print("unity ship = {}".format(ship))
+    print("Counter: ", recursion_counter)
+
+    point_x = ship[0]
+    point_y = ship[1]
+
+    if "X" not in table[point_x][point_y]:
+        table[point_x][point_y] = "\033[93mX\033[0m "
+        return True
+    else:
+        return False if recursion_counter > 10 else draw_the_unity_ship(table, recursion_counter+1)
+
+
+def get_coordinates_of_duality_ship():
+    """
     :return: [[point_1_x, point_1_y], [point_2_x, point_2_y]]
     """
 
@@ -33,10 +67,10 @@ def get_coordinates_of_duality_ship():
     # We don't want some points to be crossed. so, now we   have
     # 4 allowed points we will take one randomly.
     temp = [
-            [point_1_x - 1, point_1_y],
-            [point_1_x, point_1_y - 1],
-            [point_1_x, point_1_y + 1],
-            [point_1_x + 1, point_1_y]
+        [point_1_x - 1, point_1_y],
+        [point_1_x, point_1_y - 1],
+        [point_1_x, point_1_y + 1],
+        [point_1_x + 1, point_1_y]
     ]
 
     k = randint(0, 3)  # Generate a key for the random point.
@@ -56,23 +90,36 @@ def get_coordinates_of_duality_ship():
     return [first_point, second_point]
 
 
-def draw_the_second_ship(table):
+def draw_the_duality_ship(table, recursion_counter=0):
     """
-
+    :param recursion_counter:
     :param table: board list
-    :return: NoneType
+    :return: Boolean
     """
-
     # [[point_1_x, point_1_y], [point_2_x, point_2_y]]
     ship = get_coordinates_of_duality_ship()
-    table[ship[0][0]][ship[0][1]] = "\033[93mX\033[0m "
-    table[ship[1][0]][ship[1][1]] = "\033[93mX\033[0m "
+    print("duality ship = {}".format(ship))
+    print("counter: ", recursion_counter)
+
+    point_1_x = ship[0][0]
+    point_1_y = ship[0][1]
+    point_2_x = ship[1][0]
+    point_2_y = ship[1][1]
+
+    if "X" not in table[point_1_x][point_1_y] and "X" not in table[point_2_x][point_2_y]:
+        table[point_1_x][point_1_y] = "\033[93mX\033[0m "
+        table[point_2_x][point_2_y] = "\033[93mX\033[0m "
+
+        return True
+    else:
+        return False if recursion_counter > 10 else draw_the_duality_ship(table, recursion_counter+1)
 
 
-row, column = 6, 6
+row, column = 3, 3
 board = create_the_board(row, column)
 
-draw_the_second_ship(board)
+draw_the_unity_ship(board)
+draw_the_duality_ship(board)
 
 for i in board:
     for x in i:
