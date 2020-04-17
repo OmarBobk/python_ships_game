@@ -37,8 +37,6 @@ def draw_the_unity_ship(table, recursion_counter=0):
 
     # [point_x, point_y]
     ship = get_coordinates_of_unity_ship()
-    print("unity ship = {}".format(ship))
-    print("Counter: ", recursion_counter)
 
     point_x = ship[0]
     point_y = ship[1]
@@ -98,14 +96,13 @@ def draw_the_duality_ship(table, recursion_counter=0):
     """
     # [[point_1_x, point_1_y], [point_2_x, point_2_y]]
     ship = get_coordinates_of_duality_ship()
-    print("duality ship = {}".format(ship))
-    print("counter: ", recursion_counter)
 
     point_1_x = ship[0][0]
     point_1_y = ship[0][1]
     point_2_x = ship[1][0]
     point_2_y = ship[1][1]
 
+    # Check if there is no ships in this coordinates
     if "X" not in table[point_1_x][point_1_y] and "X" not in table[point_2_x][point_2_y]:
         table[point_1_x][point_1_y] = "\033[93mX\033[0m "
         table[point_2_x][point_2_y] = "\033[93mX\033[0m "
@@ -115,14 +112,46 @@ def draw_the_duality_ship(table, recursion_counter=0):
         return False if recursion_counter > 10 else draw_the_duality_ship(table, recursion_counter+1)
 
 
-row, column = 3, 3
+def get_coordinates_of_trinity_ship():
+    """
+        :return: [[point_1_x, point_1_y], [point_2_x, point_2_y], [point_3_x, point_3_y]]
+    """
+    # [[point_1_x, point_1_y], [point_2_x, point_2_y]]
+    duality = get_coordinates_of_duality_ship()
+    x = duality[1][0]  # 3
+    y = duality[1][1]  # 3
+
+    allowed_points = [
+        [x+1, y],  # 4, 3
+        [x-2, y],  # 1, 3
+        [x-1, y],  # 2, 3
+        [x+2, y],  # 5, 3
+        [x, y+1],  # 3, 4
+        [x, y-2],  # 3, 1
+        [x, y-1],  # 3, 2
+        [x, y+2],  # 3, 5
+    ]
+
+    allowed_points_key = randint(0, 7)
+    z = [allowed_points[allowed_points_key][0],
+         allowed_points[allowed_points_key][1]]
+
+    print(duality)
+    print(allowed_points_key)
+    print("--------")
+    print([x, y], z)
+    print("--------")
+
+
+row, column = 6, 6
 board = create_the_board(row, column)
 
-draw_the_unity_ship(board)
-draw_the_duality_ship(board)
+get_coordinates_of_trinity_ship()
 
 for i in board:
     for x in i:
         print(x, end="")
 
     print()
+
+
