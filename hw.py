@@ -15,45 +15,6 @@ def create_the_board(rows, columns):
     return li
 
 
-def is_vertically(duality_ship):
-    """
-    Check if the given duality ship is vertically or horizontally
-    :type duality_ship: [[point_1_x, point_1_y], [point_2_x, point_2_y]]
-    :return: Boolean
-    """
-
-    # The first point x
-    point_1_x = duality_ship[0][0]
-
-    # The second point x
-    point_2_x = duality_ship[1][0]
-
-    return False if point_1_x == point_2_x else True
-
-
-def is_empty_list(li):
-    """
-    Check if the given list is empty or not
-    :param li:
-    :return: Boolean
-    """
-    if len(li) == 0:
-        return True
-    else:
-        return False
-
-
-def rest_of_list(li):
-    """
-    Remove the first item of the given list and return it
-    :param li: list [[point_x_1, point_y_1], [point_x_2, point_y_2], ...]
-    :return: list
-    """
-    ship = li.copy()
-    ship.remove(ship[0])
-    return ship
-
-
 def get_allowed_point(allowed_points, cases):
     """
 
@@ -66,15 +27,15 @@ def get_allowed_point(allowed_points, cases):
     point_x = allowed_points[allowed_points_key][0]
     point_y = allowed_points[allowed_points_key][1]
     # Don't let the point sit on the borders
-    while point_x == 0 or point_y == 0 or point_x == row or point_y == column:
+    while point_x == 0 or point_y == 0:
         allowed_points_key = randint(0, 1)  # Generate a new key for the NEW random point
         point_x = allowed_points[allowed_points_key][0]
         point_y = allowed_points[allowed_points_key][1]
 
-    return [point_x, point_y]
+    return [point_x, point_y, allowed_points_key]
 
 
-def get_coordinates_of_unity_ship():
+def get_coordinates_of_unity_ship(table, recursion_counter=0):
     """
         :return: list of lists of ints [x, y]
     """
@@ -84,94 +45,198 @@ def get_coordinates_of_unity_ship():
     point_y = randint(1, column - 1)
 
     # The coordinates of the unity ship
-    return [[point_x, point_y]]
+    if table[point_x][point_y][0] == "?":
+        print("unity")
+        table[point_x][point_y] = "\033[93mX\033[0m "
+        return [[point_x, point_y]]
+    else:
+        return False if recursion_counter > 10 else get_coordinates_of_unity_ship(table, recursion_counter + 1)
 
 
-def get_coordinates_of_duality_ship():
+def get_coordinates_of_duality_ship(table, first_point, recursion_counter=0):
     """
     :return: [[point_1_x, point_1_y], [point_2_x, point_2_y]]
     """
-
+    omar = ""
     # The first point
     # [[point_1_x, point_1_y]]
-    first_point = get_coordinates_of_unity_ship()
+    # [2, 5]
+    # first_point = get_coordinates_of_unity_ship(table)
+    x = first_point[0][0]
+    y = first_point[0][1]
 
-    # allowed points for second point
-    allowed_points = [
-        [first_point[0][0], first_point[0][1] + 1],
-        [first_point[0][0] + 1, first_point[0][1]]
-    ]
+    if x == row - 1 and y == column - 1:
+        cases = 1
+        flag = "a"
+        allowed_points = [
+            [x, y - 1],
+            [x-1, y]
+        ]
+    elif x == row - 1:
+        cases = 2
+        flag = "b"
+        allowed_points = [
+            [x-1, y],
+            [x, y-1],
+            [x, y+1]
+        ]
+    elif y == column - 1:
+        cases = 2
+        flag = "c"
+        allowed_points = [
+            [x, y-1],
+            [x-1, y],
+            [x+1, y],
+        ]
+    else:
+        cases = 3
+        flag = "d"
+        allowed_points = [
+            [x, y - 1],
+            [x, y + 1],
+            [x - 1, y],
+            [x + 1, y],
+        ]
 
     # The second point
-    second_point = get_allowed_point(allowed_points, 1)  # [point_x, point_y]
+    allowed_point = get_allowed_point(allowed_points, cases)  # [point_2_x, point_2_y, allowed_points_key]
+    second_point = [allowed_point[0], allowed_point[1]]
+    allowed_key_point = allowed_point[2]
+    if flag == "a":
+        if allowed_key_point == 0:
+            omar = "x, y-1"
+        elif allowed_key_point == 1:
+            omar = "x-1, y"
+    elif flag == "b":
+        if allowed_key_point == 0:
+            omar = "x-1, y"
+        elif allowed_key_point == 1:
+            omar = "x, y-1"
+        elif allowed_key_point == 2:
+            omar = "x, y+1"
+    elif flag == "c":
+        if allowed_key_point == 0:
+            omar = "x, y-1"
+        elif allowed_key_point == 1:
+            omar = "x-1, y"
+        elif allowed_key_point == 2:
+            omar = "x+1, y"
+    elif flag == "d":
+        if allowed_key_point == 0:
+            omar = "x, y-1"
+        elif allowed_key_point == 1:
+            omar = "x, y+1"
+        elif allowed_key_point == 2:
+            omar = "x-1, y"
+        elif allowed_key_point == 3:
+            omar = "x+1, y"
+
     # The coordinates of the duality ship
-    return [first_point[0], second_point]
+    # [[point_1_x, point_1_y], [point_2_x, point_2_y], omar]
+    ship = [first_point[0], second_point, omar]
+
+    if table[second_point[0]][second_point[1]][0] == "?":
+        print("duality")
+        table[second_point[0]][second_point[1]] = "\033[93mX\033[0m "
+        return ship
+    else:
+        print("Recursion duality")
+        return False if recursion_counter > 10 else get_coordinates_of_duality_ship(table, first_point,
+                                                                                    recursion_counter + 1)
 
 
-def get_coordinates_of_trinity_ship():
+def get_coordinates_of_trinity_ship(table, duality, recursion_counter=0):
     """
+        :param table: list
+        :type recursion_counter: int
         :return: [[point_1_x, point_1_y], [point_2_x, point_2_y], [point_3_x, point_3_y]]
     """
-    duality = get_coordinates_of_duality_ship()
-
-    if is_vertically(duality):
-        allowed_points = [
-            [duality[1][0] + 1, duality[1][1]],
-            [duality[1][0] - 2, duality[1][1]],
-        ]
-    else:
-        allowed_points = [
-            [duality[1][0], duality[1][1] + 1],
-            [duality[1][0], duality[1][1] - 2],
-        ]
-
-    return [
-        [duality[0][0], duality[0][1]],
-        [duality[1][0], duality[1][1]],
-        get_allowed_point(allowed_points, 1)
-    ]
-
-
-def get_coordinates(which_ship):
-    """
-    :type which_ship: int
-    """
-    if which_ship == 1:
-        return get_coordinates_of_unity_ship()
-    elif which_ship == 2:
-        return get_coordinates_of_duality_ship()
-    elif which_ship == 3:
-        return get_coordinates_of_trinity_ship()
-
-
-def draw_the_ship(table, ship, which_ship, recursion_counter=0):
-    """
-    :param which_ship: 2
-    :param ship: # [[point_x, point_y]]
-    :param recursion_counter:
-    :param table: board list
-    :return: Boolean
-    """
-
-    new_ship = get_coordinates(which_ship)
-
-    if is_empty_list(ship):
-        return True
-    else:
-        if "X" not in table[ship[0][0]][ship[0][1]] and draw_the_ship(table, rest_of_list(ship), which_ship):
-            table[ship[0][0]][ship[0][1]] = "\033[93mX\033[0m "
-            return True
+    # Draw the first tow points and return them coordinates
+    # [[point_1_x, point_1_y], [point_2_x, point_2_y], omar]
+    x = duality[0][0]
+    y = duality[0][1]
+    # if y+1: use y+2 or y-1
+    # if y-1: use y-2 or y+1
+    # if x+1: use x+2 or x-1
+    # if x-1: use x-2 or x+1
+    omar = duality[2]
+    if omar == "x, y+1":
+        if y == column-2:
+            cases = 0
+            allowed_points = [
+                [x, y - 1]
+            ]
         else:
-            return False if recursion_counter > 10 else draw_the_ship(table, new_ship, which_ship, recursion_counter+1)
+            cases = 1
+            allowed_points = [
+                [x, y+2],
+                [x, y-1]
+            ]
+
+    elif omar == "x, y-1":
+        if y == column-1:
+            cases = 0
+            allowed_points = [
+                [x, y - 2]
+            ]
+        else:
+            cases = 1
+            allowed_points = [
+                [x, y - 2],
+                [x, y + 1]
+            ]
+    elif omar == "x+1, y":
+        if x == row-2:
+            cases = 0
+            allowed_points = [
+                [x - 1, y]
+            ]
+        else:
+            cases = 1
+            allowed_points = [
+                [x + 2, y],
+                [x - 1, y]
+            ]
+
+    elif omar == "x-1, y":
+        if x == row-1:
+            cases = 0
+            allowed_points = [
+                [x - 2, y]
+            ]
+        else:
+            cases = 1
+            allowed_points = [
+                [x + 1, y],
+                [x - 2, y]
+            ]
+
+    else:
+        cases = None  # fucking error
+        allowed_points = None  # fucking error
+
+    # [point_x, point_y, allowed_points_key]
+    allowed_point = get_allowed_point(allowed_points, cases)
+    third_point = [allowed_point[0], allowed_point[1]]
+    ship = [duality[0], duality[1], third_point]
+    if table[third_point[0]][third_point[1]][0] == "?":
+        print("trinity")
+        table[third_point[0]][third_point[1]] = "\033[93mX\033[0m "
+    else:
+        print("Recursion trinity")
+        print(ship)
+        return False if recursion_counter > 30 else get_coordinates_of_trinity_ship(table, duality, recursion_counter+1)
 
 
-row, column = 11, 11
+row, column = 6, 6
 board = create_the_board(row, column)
 
-draw_the_ship(board, get_coordinates(1), 1)  # the first ship
-draw_the_ship(board, get_coordinates(2), 2)  # the second ship
-draw_the_ship(board, get_coordinates(3), 3)  # the third ship
 
+get_coordinates_of_unity_ship(board)
+get_coordinates_of_duality_ship(board, get_coordinates_of_unity_ship(board))
+get_coordinates_of_trinity_ship(board,
+                                get_coordinates_of_duality_ship(board,
+                                                                get_coordinates_of_unity_ship(board)))
 
 for i in board:
     for x in i:
