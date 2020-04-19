@@ -17,7 +17,6 @@ def create_the_board(rows, columns):
 
 def get_allowed_point(allowed_points, cases):
     """
-
     :param allowed_points: list of list of ints [[point_x_1, point_y_1], [point_x_2, point_y_2], ...]
     :param cases: int number of lists inside allowed_points
     :return: list of ints [int, int]
@@ -46,7 +45,6 @@ def get_coordinates_of_unity_ship(table, recursion_counter=0):
 
     # The coordinates of the unity ship
     if table[point_x][point_y][0] == "?":
-        print("unity")
         table[point_x][point_y] = "\033[93mX\033[0m "
         return [[point_x, point_y]]
     else:
@@ -136,17 +134,16 @@ def get_coordinates_of_duality_ship(table, first_point, recursion_counter=0):
     ship = [first_point[0], second_point, omar]
 
     if table[second_point[0]][second_point[1]][0] == "?":
-        print("duality")
         table[second_point[0]][second_point[1]] = "\033[93mX\033[0m "
         return ship
     else:
-        print("Recursion duality")
         return False if recursion_counter > 10 else get_coordinates_of_duality_ship(table, first_point,
                                                                                     recursion_counter + 1)
 
 
 def get_coordinates_of_trinity_ship(table, duality, recursion_counter=0):
     """
+        :type duality: list
         :param table: list
         :type recursion_counter: int
         :return: [[point_1_x, point_1_y], [point_2_x, point_2_y], [point_3_x, point_3_y]]
@@ -220,27 +217,67 @@ def get_coordinates_of_trinity_ship(table, duality, recursion_counter=0):
     third_point = [allowed_point[0], allowed_point[1]]
     ship = [duality[0], duality[1], third_point]
     if table[third_point[0]][third_point[1]][0] == "?":
-        print("trinity")
         table[third_point[0]][third_point[1]] = "\033[93mX\033[0m "
     else:
-        print("Recursion trinity")
-        print(ship)
         return False if recursion_counter > 30 else get_coordinates_of_trinity_ship(table, duality, recursion_counter+1)
 
 
 row, column = 6, 6
 board = create_the_board(row, column)
 
-
-get_coordinates_of_unity_ship(board)
-get_coordinates_of_duality_ship(board, get_coordinates_of_unity_ship(board))
 get_coordinates_of_trinity_ship(board,
                                 get_coordinates_of_duality_ship(board,
                                                                 get_coordinates_of_unity_ship(board)))
+get_coordinates_of_duality_ship(board, get_coordinates_of_unity_ship(board))
+get_coordinates_of_unity_ship(board)
 
-for i in board:
+
+def show_the_board(table):
+    for i in table:
+        for x in i:
+            print(x, end="")
+
+        print()
+
+
+hidden_board = create_the_board(row, column)
+end_or_continue = 0
+end_the_game = False
+counter = 0
+counter_1 = 0
+
+number_of_attempts = ((row - 1) * (column - 1)) // 3
+
+while end_or_continue == 1:
+    counter += 1
+    hidden_or_not = int(input("Please Enter ( 1 ) for hidden mode and ( 2 ) for unhidden mode: "))
+    if hidden_or_not == 2:
+        show_the_board(board)
+        end_or_continue = int(input("If you want to play again Enter ( 1 ) If not Enter ( 2 )."))
+        if end_or_continue == 2:
+            break
+    else:
+        while not end_the_game:
+            counter_1 += 1
+
+            row_number = int(input("choose the row number: "))
+            column_number = int(input("choose the column number: "))
+
+            if "X" in board[row_number][column_number]:
+                hidden_board[row_number][column_number] = "\033[92mX\033[0m "
+            else:
+                hidden_board[row_number][column_number] = "\033[91m*\033[0m "
+
+            if counter_1 > number_of_attempts:
+                break
+
+    if counter > 100:
+        break
+
+
+print("______________")
+for i in hidden_board:
     for x in i:
         print(x, end="")
 
     print()
-
